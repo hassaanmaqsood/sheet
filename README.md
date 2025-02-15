@@ -29,6 +29,7 @@ function buildSheet(contentElements, config = {})
 | `description` | String  | `''` | The subtitle or description text of the sheet. |
 | `progress`   | Object  | `{ mode: '' }` | Defines the progress bar mode (`'int'` for definite progress, `'inf'` for indefinite progress). |
 | `onClose`    | Function | `(sheet) => console.warn('sheet closed', sheet)` | Callback function executed when the sheet is closed. |
+| 'dragCloseEnable' | Boolean | `true` | Toggles the draggable sheet close |
 
 ### Icon Options:
 Each icon can be configured separately:
