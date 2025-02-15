@@ -5,6 +5,7 @@ function buildSheet(contentElements, config = {}) {
 	const defaultConfig = {
 		size: 'content', // content, full,
 		blockBg: false, // if true, obscure background with overlay
+		dragCloseEnable: true,
 		heading: '',
 		description: '',
 		iconLeft: {
@@ -228,6 +229,26 @@ function buildSheet(contentElements, config = {}) {
 		)
 	}
 
+	if(config.hasOwnProperty('dragCloseEnable')) {
+		config.dragCloseEnable ?
+		onDrag(sheet.querySelector(".sheet-drag"), () => {
+			sheet.close();
+			config.onClose ? config.onClose(sheet) : defaultConfig.onClose(sheet);
+		}) :
+		sheet.querySelector(".sheet-drag").parentElement.removeChild(
+			sheet.querySelector(".sheet-drag")
+		);
+	} else if(defaultConfig.dragCloseEnable) {
+		onDrag(sheet.querySelector(".sheet-drag"), () => {
+			sheet.close();
+			config.onClose ? config.onClose(sheet) : defaultConfig.onClose(sheet);
+		});
+	} else {
+		sheet.querySelector(".sheet-drag").parentElement.removeChild(
+			sheet.querySelector(".sheet-drag")
+		);
+	}
+
 	// add elements
 	contentElements.forEach((element) =>
 		sheet.querySelector(".content-container").appendChild(element)
@@ -241,12 +262,6 @@ function buildSheet(contentElements, config = {}) {
 
 		// css open animation
 		sheet.dataset.isOpen = "true";
-
-		// add event listeners
-		onDrag(sheet.querySelector(".sheet-drag"), () => {
-			sheet.close();
-			config.onClose ? config.onClose(sheet) : defaultConfig.onClose(sheet);
-		});
 
 		return sheet;
 	};
