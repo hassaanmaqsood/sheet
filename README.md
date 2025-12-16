@@ -1,133 +1,344 @@
-# Sheet Documentation
+# Bottom Sheet Web Component
 
-## Overview
+A modern, declarative, framework-agnostic bottom sheet component built with Web Components.
 
-The `buildSheet` function is used to create a customizable bottom sheet modal in a web application. It allows users to specify various configurations such as size, icons, buttons, progress indicators, and more. This function returns a `sheet` element that can be manipulated with methods like `open`, `close`, and `update`.
+## 🚀 Quick Start
 
----
-
-## Function Signature
-
-```js
-function buildSheet(contentElements, config = {})
+### 1. Include the component
+```html
+<script src="bottom-sheet.js"></script>
 ```
 
-### Parameters:
-- `contentElements` (Array of DOM Elements): An array of HTML elements that will be placed inside the sheet's content container.
-- `config` (Object, optional): An optional configuration object to customize the sheet's appearance and behavior.
-
----
-
-## Configuration Options
-
-### General Options:
-| Option         | Type    | Default     | Description |
-|--------------|--------|-------------|-------------|
-| `size`       | String | `'content'` | Defines the size of the sheet (`'content'`, `'full'`). |
-| `blockBg`    | Boolean | `false` | If `true`, the background is obscured with an overlay. |
-| `heading`    | String  | `''` | The title text of the sheet. |
-| `description` | String  | `''` | The subtitle or description text of the sheet. |
-| `progress`   | Object  | `{ mode: '' }` | Defines the progress bar mode (`'int'` for definite progress, `'inf'` for indefinite progress). |
-| `onClose`    | Function | `(sheet) => console.warn('sheet closed', sheet)` | Callback function executed when the sheet is closed. |
-| `dragCloseEnable` | Boolean | `true` | Toggles the draggable sheet close |
-
-### Icon Options:
-Each icon can be configured separately:
-| Property       | Type      | Default   | Description |
-|--------------|---------|-----------|-------------|
-| `label`     | String  | `'back'` (left), `'close'` (right) | The icon label from [Google Fonts Icons](https://fonts.google.com/icons). |
-| `onClick`   | Function | `() => {}` | Function executed on icon click. |
-| `customClassList` | Array  | `[]` | List of custom CSS classes applied to the icon. |
-
-### Button (CTA) Options:
-| Property       | Type      | Default   | Description |
-|--------------|---------|-----------|-------------|
-| `label`     | String  | `''` | Text for the button. |
-| `onClick`   | Function | `() => {}` | Function executed on button click. |
-| `customClassList` | Array  | `[]` | List of custom CSS classes applied to the button. |
-
----
-
-## Methods
-
-### `open(selector = 'body')`
-Appends the sheet to the specified DOM element (default is `<body>`) and plays the opening animation.
-
-#### Example:
-```js
-const mySheet = buildSheet([document.createElement('p')], { heading: 'My Sheet' });
-mySheet.open();
+### 2. Use it declaratively
+```html
+<bottom-sheet heading="Welcome" description="Get started" open block-bg>
+  <p>Your content here</p>
+  <button slot="cta-primary">Continue</button>
+  <button slot="cta-secondary">Cancel</button>
+</bottom-sheet>
 ```
 
-### `close()`
-Triggers the closing animation and removes the sheet from the DOM.
-
-#### Example:
-```js
-mySheet.close();
-```
-
-### `update(newElements)`
-Replaces the current content inside the sheet with new elements.
-
-#### Example:
-```js
-mySheet.update([document.createElement('div')]);
-```
-
-### `setProgress(progress)`
-Updates the progress bar within the sheet.
-
-#### Example:
-```js
-mySheet.setProgress(0.5); // Sets progress to 50%
-mySheet.setProgress(1); // Hides the progress bar
-```
-
----
-
-## Example Usage
-
-### Basic Sheet with Title and Close Button
-```js
-const sheet = buildSheet([
-    Object.assign(document.createElement('p'), { textContent: 'Hello World!' })
-], {
-    heading: 'Sample Sheet',
-    iconRight: {
-        label: 'close',
-        onClick: (sheet) => sheet.close()
-    }
-});
-
+### 3. Or create programmatically
+```javascript
+const sheet = document.createElement('bottom-sheet');
+sheet.heading = 'Settings';
+sheet.blockBg = true;
+sheet.innerHTML = '<p>Settings content</p>';
+document.body.appendChild(sheet);
 sheet.open();
 ```
 
-### Full-Screen Sheet with CTA Buttons
-```js
-const sheet = buildSheet([
-    Object.assign(document.createElement('p'), { textContent: 'This is a full-screen modal.' })
-], {
-    size: 'full',
-    heading: 'Full Screen',
-    ctaPrimary: {
-        label: 'Confirm',
-        onClick: (sheet) => {
-            alert('Confirmed!');
-            sheet.close();
-        }
-    },
-    ctaSecondary: {
-        label: 'Cancel',
-        onClick: (sheet) => sheet.close()
-    }
+## 📋 Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `heading` | string | '' | Sheet title |
+| `description` | string | '' | Sheet description |
+| `size` | 'content' \| 'full' | 'content' | Sheet size |
+| `open` | boolean | false | Whether sheet is open |
+| `block-bg` | boolean | false | Show backdrop overlay |
+| `drag-close` | boolean | true | Enable drag-to-close |
+| `icon-left` | string | 'arrow_back' | Left icon (Material Symbol) |
+| `icon-right` | string | 'close' | Right icon (Material Symbol) |
+| `progress-mode` | 'int' \| 'inf' | - | Progress bar mode |
+
+## 🎯 Methods
+
+```javascript
+const sheet = document.querySelector('bottom-sheet');
+
+// Open/Close/Toggle
+sheet.open();
+sheet.close();
+sheet.toggle();
+
+// Update content
+sheet.updateContent('<p>New content</p>');
+
+// Set properties
+sheet.setHeading('New Title');
+sheet.setDescription('New description');
+sheet.setProgress(0.5); // 0 to 1
+
+// Method chaining
+sheet
+  .setHeading('Loading...')
+  .setProgress(0.3)
+  .open();
+```
+
+## 📡 Events
+
+```javascript
+sheet.addEventListener('sheet-open', (e) => {
+  console.log('Opened!', e.detail.sheet);
 });
 
-sheet.open();
+sheet.addEventListener('sheet-close', (e) => {
+  console.log('Closed!', e.detail.sheet);
+});
+
+sheet.addEventListener('icon-left-click', (e) => {
+  console.log('Left icon clicked!');
+});
 ```
+
+## 🎨 Custom Styling with CSS Parts
+
+```css
+/* Style the container */
+bottom-sheet::part(container) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Style the title */
+bottom-sheet::part(title) {
+  color: white;
+  font-size: 24px;
+}
+
+/* Style the content area */
+bottom-sheet::part(content) {
+  padding: 40px;
+}
+
+/* Other available parts */
+bottom-sheet::part(backdrop) { }
+bottom-sheet::part(header) { }
+bottom-sheet::part(description) { }
+bottom-sheet::part(icon-left) { }
+bottom-sheet::part(icon-right) { }
+bottom-sheet::part(progress) { }
+bottom-sheet::part(footer) { }
+```
+
+## 🎭 Slots
+
+```html
+<bottom-sheet heading="Custom">
+  <!-- Default slot for main content -->
+  <div>Main content here</div>
+  
+  <!-- Named slots -->
+  <span slot="icon-left" class="material-symbols-outlined">menu</span>
+  <span slot="icon-right" class="material-symbols-outlined">close</span>
+  <button slot="cta-primary">Save</button>
+  <button slot="cta-secondary">Cancel</button>
+</bottom-sheet>
+```
+
+## 🌟 Usage Examples
+
+### Basic Sheet
+```html
+<bottom-sheet heading="Welcome" open>
+  <p>Content here</p>
+</bottom-sheet>
+```
+
+### Modal Sheet with Backdrop
+```html
+<bottom-sheet heading="Settings" block-bg open>
+  <p>Modal behavior</p>
+</bottom-sheet>
+```
+
+### Full Size Sheet
+```html
+<bottom-sheet heading="Full Screen" size="full" open>
+  <p>Takes full viewport</p>
+</bottom-sheet>
+```
+
+### With Progress Bar
+```html
+<bottom-sheet heading="Loading" progress-mode="int" open>
+  <p>Please wait...</p>
+</bottom-sheet>
+
+<script>
+let progress = 0;
+setInterval(() => {
+  progress += 0.1;
+  sheet.setProgress(progress);
+}, 500);
+</script>
+```
+
+### Indeterminate Progress
+```html
+<bottom-sheet heading="Processing" progress-mode="inf" open>
+  <p>Working on it...</p>
+</bottom-sheet>
+```
+
+### With Form
+```html
+<bottom-sheet heading="Contact" block-bg>
+  <form>
+    <input type="email" placeholder="Email" />
+    <textarea placeholder="Message"></textarea>
+  </form>
+  <button slot="cta-primary">Submit</button>
+  <button slot="cta-secondary">Cancel</button>
+</bottom-sheet>
+```
+
+### Programmatic Creation
+```javascript
+function showNotification(message) {
+  const sheet = document.createElement('bottom-sheet');
+  sheet.heading = 'Notification';
+  sheet.blockBg = true;
+  sheet.innerHTML = `<p>${message}</p>`;
+  
+  const btn = document.createElement('button');
+  btn.slot = 'cta-primary';
+  btn.textContent = 'OK';
+  btn.onclick = () => {
+    sheet.close();
+    setTimeout(() => sheet.remove(), 300);
+  };
+  sheet.appendChild(btn);
+  
+  document.body.appendChild(sheet);
+  sheet.open();
+}
+```
+
+## 🔧 Framework Integration
+
+### React
+```jsx
+function App() {
+  const sheetRef = useRef(null);
+  
+  return (
+    <>
+      <button onClick={() => sheetRef.current.open()}>
+        Open Sheet
+      </button>
+      
+      <bottom-sheet 
+        ref={sheetRef}
+        heading="React Sheet"
+        block-bg="true"
+      >
+        <p>React content</p>
+      </bottom-sheet>
+    </>
+  );
+}
+```
+
+### Vue
+```vue
+<template>
+  <button @click="$refs.sheet.open()">Open Sheet</button>
+  
+  <bottom-sheet 
+    ref="sheet"
+    heading="Vue Sheet"
+    block-bg
+    @sheet-close="handleClose"
+  >
+    <p>Vue content</p>
+  </bottom-sheet>
+</template>
+```
+
+### Angular
+```typescript
+@Component({
+  template: `
+    <button (click)="openSheet()">Open Sheet</button>
+    
+    <bottom-sheet 
+      #sheet
+      heading="Angular Sheet"
+      block-bg
+      (sheet-close)="handleClose()"
+    >
+      <p>Angular content</p>
+    </bottom-sheet>
+  `
+})
+export class MyComponent {
+  @ViewChild('sheet') sheet!: ElementRef;
+  
+  openSheet() {
+    this.sheet.nativeElement.open();
+  }
+}
+```
+
+## ✨ Features
+
+- ✅ Declarative HTML API
+- ✅ Framework agnostic (works with React, Vue, Angular, etc.)
+- ✅ Touch & drag gestures
+- ✅ Keyboard navigation (ESC to close)
+- ✅ Progress indicators
+- ✅ Custom styling with CSS Parts
+- ✅ Event-driven architecture
+- ✅ Method chaining
+- ✅ Shadow DOM encapsulation
+- ✅ No dependencies
+- ✅ Lightweight
+- ✅ Accessible (ARIA labels)
+
+## 🌐 Browser Support
+
+Works in all modern browsers that support Web Components:
+- Chrome/Edge 67+
+- Firefox 63+
+- Safari 13.1+
+- Opera 54+
+
+## 📝 TypeScript Support
+
+```typescript
+declare global {
+  interface HTMLElementTagNameMap {
+    'bottom-sheet': BottomSheet;
+  }
+}
+
+interface BottomSheet extends HTMLElement {
+  // Properties
+  heading: string;
+  description: string;
+  open: boolean;
+  size: 'content' | 'full';
+  blockBg: boolean;
+  dragClose: boolean;
+  progress: number;
+  
+  // Methods
+  open(): BottomSheet;
+  close(): BottomSheet;
+  toggle(): BottomSheet;
+  updateContent(content: HTMLElement | string): BottomSheet;
+  setProgress(value: number): BottomSheet;
+  setHeading(text: string): BottomSheet;
+  setDescription(text: string): BottomSheet;
+}
+```
+
+## 🤝 Contributing
+
+Improvements welcome! This component provides a solid foundation and can be extended with:
+- Animation customization
+- More size options
+- Swipe gestures in multiple directions
+- Nested sheets
+- Persistent storage integration
+- And more!
+
+## 📄 License
+
+MIT - Feel free to use in your projects!
 
 ---
 
-## Conclusion
-The `buildSheet` function provides a flexible and customizable way to create bottom sheets for web applications. By leveraging icons, buttons, progress indicators, and animations, developers can seamlessly integrate interactive modals into their UI.
-
+**Made with ❤️ using Web Components**
